@@ -4,19 +4,22 @@ from time import sleep
 
 
 def check_players_validation(player_num):
-    return int(player_num) if player_num.isdigit() and 7 > player_num > 2 else None
+    try:
+        player_num = int(player_num)
+    except ValueError:
+        player_num = 0
+    return player_num if 7 > player_num > 1 else None
 
 
 def choose_a_winner(players):
-    valid_players = {name:score for name, score in players if score < 22}
+    valid_players = {player:score for player, score in players.items() if score < 22}
     sorted_players = sorted(valid_players.items(), key=itemgetter(1), reverse=True)
     winners = []
     max_score = 0
     for name, score in sorted_players:
         if score >= max_score:
+            max_score = score
             winners.append(name)
-        else:
-            break
     return winners
 
 
@@ -30,7 +33,12 @@ def get_players():
     
     # Fill the players dict with players
     for i in range(player_num):
-        name = input(f"Please, enter a name for Player #{i + 1}: ")
+        while True:
+            name = input(f"Please, enter a name for Player #{i + 1}: ")
+            if name in players_dict:
+                print("This player is playing already. Please choose another name!")
+            else:
+                break
         players_dict[name] = 0
     
     return players_dict
@@ -48,12 +56,12 @@ def main():
     for player in players:
         
         # Take 2 cards at start
-        players[player] += sum(card1 := deck.pop(), card2 := deck.pop())
+        players[player] += sum((card1 := deck.pop(), card2 := deck.pop()))
         print(f"{player}, you took two cards {card1} and {card2}")
         if card1 == 11 and card2 == 11:
             print(f"You have 2 aces! You won! Game over and the winner is {player}!!! Congratulations!")
-        sleep(2)
-        exit()
+            exit()
+        sleep(1.5)
 
 
     for player in players:
