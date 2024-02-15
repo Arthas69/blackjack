@@ -4,7 +4,7 @@ from time import sleep
 
 
 def check_players_validation(player_num):
-    return int(player_num) if player_num.isdigit() else None
+    return int(player_num) if player_num.isdigit() and 7 > player_num > 2 else None
 
 
 def choose_a_winner(players):
@@ -20,23 +20,29 @@ def choose_a_winner(players):
     return winners
 
 
+def get_players():
+    players_dict = {}
+    print("Please enter the number of players in game. Note that number must be between 2 and 6 inclusively!")
+    
+    while True:
+        player_num = check_players_validation(input("Number of Players: "))
+        if player_num: break
+    
+    # Fill the players dict with players
+    for i in range(player_num):
+        name = input(f"Please, enter a name for Player #{i + 1}: ")
+        players_dict[name] = 0
+    
+    return players_dict
+
 
 def main():
-    while True:
-        N = check_players_validation(input("Number of Players: "))
-        if N: break
-
     # Create deck
     deck = [2, 3, 4, 6, 7, 8, 9, 10, 11] * 4
     shuffle(deck)
 
-    # Dict with all players
-    players = {}
-
-    # Fill the players dict with players
-    for i in range(N):
-        name = input(f"Please, enter a name for Player #{i + 1}: ")
-        players[name] = 0
+    # Gather all players
+    players = get_players()
 
     # GAME
     for player in players:
@@ -45,8 +51,9 @@ def main():
         players[player] += sum(card1 := deck.pop(), card2 := deck.pop())
         print(f"{player}, you took two cards {card1} and {card2}")
         if card1 == 11 and card2 == 11:
-            print("You have 2 aces! You won! Game over and the winner is {player}!!! Congratulations!")
+            print(f"You have 2 aces! You won! Game over and the winner is {player}!!! Congratulations!")
         sleep(2)
+        exit()
 
 
     for player in players:
@@ -55,16 +62,14 @@ def main():
 
         while True:
             choice = input(f"{player}, do you want to take 1 more? y/n ")
-
             if choice == 'y':
                 new_card = deck.pop()
                 score += new_card
                 print(f"You took card with rank {new_card}")
                 sleep(0.5)
                 print(f"Your new score is {score}")
-                
                 if score > 21:
-                    print("You're busted! Try next time!")
+                    print("You're busted! See you!")
                     sleep(1)
                     break
                 elif score == 21:
@@ -72,7 +77,6 @@ def main():
                     print("Next player...")
                     sleep(1)
                     break
-
             elif choice == 'n':
                 print(f'You have {score} points! Next player...')
                 sleep(1)
